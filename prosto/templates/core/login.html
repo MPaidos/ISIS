@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+{% block title %}Вход - ПроСТО{% endblock %}
+{% block content %}
+<div class="text-center mb-4">
+    <i class="fas fa-car fa-3x" style="color: #A7D0CD;"></i>
+    <h2 class="mt-2">Вход</h2>
+</div>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <input type="text" name="username" class="form-control" placeholder="Имя пользователя" required>
+    </div>
+    <div class="mb-3">
+        <input type="password" name="password" class="form-control" placeholder="Пароль" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Войти</button>
+</form>
+<p class="text-center mt-3">Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
+{% endblock %}

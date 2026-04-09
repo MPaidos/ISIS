@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+{% block title %}Подтверждение - ПроСТО{% endblock %}
+{% block content %}
+<div class="text-center mb-4">
+    <i class="fas fa-check-circle fa-4x" style="color: #A7D0CD;"></i>
+    <h3 class="mt-2">Запись создана!</h3>
+    <p class="text-muted">ID записи: {{ appointment.id }}</p>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <p><strong>Автомобиль:</strong> {{ appointment.vehicle.brand }} {{ appointment.vehicle.model }}</p>
+        <p><strong>Дата:</strong> {{ appointment.date }}</p>
+        <p><strong>Время:</strong> {{ appointment.time }}</p>
+        <p><strong>Услуги:</strong></p>
+        <ul>
+            {% for service in appointment.services.all %}
+                <li>{{ service.name }} — {{ service.price }} ₽</li>
+            {% endfor %}
+        </ul>
+        <p><strong>Статус:</strong> <span class="badge-status status-pending">Ожидает подтверждения</span></p>
+    </div>
+</div>
+
+<div class="alert alert-info mt-3">
+    <i class="fas fa-info-circle"></i> Мы свяжемся с вами для подтверждения записи.
+</div>
+
+<a href="{% url 'home' %}" class="btn btn-primary w-100">На главную</a>
+{% endblock %}

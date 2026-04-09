@@ -1,0 +1,208 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Статус заказа #{{ order.id }} - ПроСТО{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="fas fa-info-circle me-2"></i>Заказ #{{ order.id }}</h4>
+    <a href="{% url 'my_orders' %}" class="btn btn-outline btn-sm">
+        <i class="fas fa-arrow-left"></i> Назад
+    </a>
+</div>
+
+<!-- Статус-бар -->
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-3">
+                <div class="step-circle {% if order_status.step >= 1 %}completed{% endif %}">1</div>
+                <div class="step-label">Запись</div>
+            </div>
+            <div class="col-3">
+                <div class="step-circle {% if order_status.step >= 2 %}completed{% endif %}">2</div>
+                <div class="step-label">Подтверждение</div>
+            </div>
+            <div class="col-3">
+                <div class="step-circle {% if order_status.step >= 3 %}completed{% endif %}">3</div>
+                <div class="step-label">Выполнение</div>
+            </div>
+            <div class="col-3">
+                <div class="step-circle {% if order_status.step >= 4 %}completed{% endif %}">4</div>
+                <div class="step-label">Завершение</div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-3">
+            <span class="badge-status {{ order_status.color }}" style="font-size: 14px;">
+                {{ order_status.icon }} {{ order_status.name }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Информация о заказе -->
+<div class="card mb-3">
+    <div class="card-header bg-white">
+        <strong><i class="fas fa-car"></i> Информация</strong>
+    </div>
+    <div class="card-body">
+        <p><strong>Автомобиль:</strong> {{ order.appointment.vehicle.brand }} {{ order.appointment.vehicle.model }}</p>
+        <p><strong>Госномер:</strong> {{ order.appointment.vehicle.license_plate }}</p>
+        <p><strong>Дата записи:</strong> {{ order.appointment.date }} {{ order.appointment.time }}</p>
+        
+        {% if order.mechanic %}
+        <p><strong>Механик:</strong> {{ order.mechanic.username }}</p>
+        {% endif %}
+        
+        {% if order.started_at %}
+        <p><strong>Начало работ:</strong> {{ order.started_at|date:"d.m.Y H:i" }}</p>
+        {% endif %}
+        
+        {% if order.completed_at %}
+        <p><strong>Завершение:</strong> {{ order.completed_at|date:"d.m.Y H:i" }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Услуги -->
+<div class="card mb-3">
+    <div class="card-header bg-white">
+        <strong><i class="fas fa-wrench"></i> Услуги</strong>
+    </div>
+    <div class="card-body">
+        <ul class="list-unstyled">
+            {% for service in order.appointment.services.all %}
+            <li class="mb-2">
+                <i class="fas fa-check-circle text-success"></i> {{ service.name }} — {{ service.price }} ₽
+            </li>
+            {% endfor %}
+        </ul>
+        <hr>
+        <div class="d-flex justify-content-between">
+            <strong>Итого услуги:</strong>
+            <strong>{{ services_total }} ₽</strong>
+        </div>
+    </div>
+</div>
+
+<!-- Запчасти (если есть) -->
+{% if parts %}
+<div class="card mb-3">
+    <div class="card-header bg-white">
+        <strong><i class="fas fa-microchip"></i> Запчасти и материалы</strong>
+    </div>
+    <div class="card-body">
+        <ul class="list-unstyled">
+            {% for part in parts %}
+            <li class="mb-2">
+                {{ part.name }} x{{ part.quantity }} — {{ part.total_price }} ₽
+            </li>
+            {% endfor %}
+        </ul>
+        <hr>
+        <div class="d-flex justify-content-between">
+            <strong>Итого запчасти:</strong>
+            <strong>{{ parts_total }} ₽</strong>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Фотоотчёт (если есть) -->
+{% if photos %}
+<div class="card mb-3">
+    <div class="card-header bg-white">
+        <strong><i class="fas fa-camera"></i> Фотоотчёт</strong>
+    </div>
+    <div class="card-body">
+        <div class="photo-grid">
+            {% for photo in photos %}
+            <div class="photo-item" data-bs-toggle="modal" data-bs-target="#photoModal{{ photo.id }}">
+                <img src="{{ photo.image.url }}" alt="Фото">
+            </div>
+            
+            <!-- Модальное окно для увеличения фото -->
+            <div class="modal fade" id="photoModal{{ photo.id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Фотоотчёт</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="{{ photo.image.url }}" class="img-fluid" alt="Фото">
+                            {% if photo.comment %}
+                            <p class="mt-2 text-muted">{{ photo.comment }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Итоговая сумма -->
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between">
+            <strong>Всего к оплате:</strong>
+            <strong class="text-success">{{ total_amount }} ₽</strong>
+        </div>
+    </div>
+</div>
+
+<!-- Кнопка оплаты (если заказ завершён и не оплачен) -->
+{% if order.status == 'completed' %}
+    {% if not order.payment or order.payment.status != 'paid' %}
+    <a href="#" class="btn btn-primary w-100 mb-2">
+        <i class="fas fa-credit-card"></i> Оплатить {{ order.total_amount }} ₽
+    </a>
+    {% else %}
+    <div class="alert alert-success text-center">
+        <i class="fas fa-check-circle"></i> Заказ оплачен
+    </div>
+    {% endif %}
+{% endif %}
+
+<a href="{% url 'my_orders' %}" class="btn btn-outline w-100">К списку заказов</a>
+
+<style>
+.step-circle {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #666;
+    margin: 0 auto;
+    font-weight: bold;
+}
+.step-circle.completed {
+    background: #A7D0CD;
+    color: white;
+}
+.step-label {
+    font-size: 12px;
+    margin-top: 8px;
+    color: #666;
+}
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+.photo-item {
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    cursor: pointer;
+}
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+</style>
+{% endblock %}

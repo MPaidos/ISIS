@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+{% block title %}Главная - ПроСТО{% endblock %}
+{% block content %}
+<div class="text-center mb-4">
+    <i class="fas fa-wrench fa-3x" style="color: #A7D0CD;"></i>
+    <h1 class="mt-3">ПроСТО</h1>
+    <p class="text-muted">Прозрачный ремонт с фотоотчётом</p>
+</div>
+
+{% if user.is_authenticated %}
+    <div class="card">
+        <div class="card-body">
+            <h5>Добро пожаловать, {{ user.username }}!</h5>
+            <p class="text-muted">Ваша роль: {{ user.get_role_display }}</p>
+            {% if user.role == 'client' %}
+                <a href="{% url 'booking' %}" class="btn btn-primary w-100 mb-2">Записаться на сервис</a>
+                <a href="{% url 'my_orders' %}" class="btn btn-outline w-100">История ремонтов</a>
+            {% elif user.role == 'mechanic' %}
+                <a href="{% url 'mechanic_dashboard' %}" class="btn btn-primary w-100">Задачи на сегодня</a>
+            {% endif %}
+        </div>
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-body text-center">
+            <p>Управляйте ремонтом автомобиля легко и прозрачно</p>
+            <a href="{% url 'login' %}" class="btn btn-primary w-100 mb-2">Вход</a>
+            <a href="{% url 'register' %}" class="btn btn-outline w-100">Регистрация</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

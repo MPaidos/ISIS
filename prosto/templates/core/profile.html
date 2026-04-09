@@ -1,0 +1,57 @@
+{% extends 'core/base.html' %}
+{% block title %}Профиль - ПроСТО{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>Профиль</h4>
+    <i class="fas fa-id-card fa-2x" style="color: #A7D0CD;"></i>
+</div>
+<div class="card">
+    <div class="card-body">
+        <p><strong>Имя:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email|default:"—" }}</p>
+        <p><strong>Телефон:</strong> {{ user.phone|default:"—" }}</p>
+        <p><strong>Роль:</strong> {{ user.get_role_display }}</p>
+    </div>
+</div>
+
+{% if user.role == 'client' %}
+<div class="mt-4">
+    <h5>Мои автомобили</h5>
+    {% for vehicle in user.vehicles.all %}
+        <div class="card mt-2">
+            <div class="card-body">
+                {{ vehicle.brand }} {{ vehicle.model }} ({{ vehicle.year }})<br>
+                <small class="text-muted">{{ vehicle.license_plate }}</small>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">Нет добавленных автомобилей</p>
+    {% endfor %}
+    <button class="btn btn-outline w-100 mt-2" data-bs-toggle="modal" data-bs-target="#addVehicleModal">+ Добавить авто</button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addVehicleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" action="{% url 'add_vehicle' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить автомобиль</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" name="brand" class="form-control mb-2" placeholder="Марка" required>
+                    <input type="text" name="model" class="form-control mb-2" placeholder="Модель" required>
+                    <input type="number" name="year" class="form-control mb-2" placeholder="Год">
+                    <input type="text" name="license_plate" class="form-control mb-2" placeholder="Госномер">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

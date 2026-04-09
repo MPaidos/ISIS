@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+{% block title %}Удаление услуги - ПроСТО{% endblock %}
+{% block content %}
+<div class="text-center mb-4">
+    <i class="fas fa-exclamation-triangle fa-4x" style="color: #F5A623;"></i>
+    <h3 class="mt-2">Удаление услуги</h3>
+</div>
+
+<div class="card">
+    <div class="card-body text-center">
+        <p>Вы уверены, что хотите удалить услугу:</p>
+        <p><strong>{{ service.name }}</strong> ({{ service.price }} ₽)</p>
+        <p class="text-muted small">Это действие необратимо.</p>
+        
+        <form method="post" class="mt-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger w-100 mb-2">
+                <i class="fas fa-trash"></i> Да, удалить
+            </button>
+            <a href="{% url 'service_list' %}" class="btn btn-outline w-100">Отмена</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if service %}Редактировать{% else %}Новая{% endif %} услуга - ПроСТО{% endblock %}
+{% block content %}
+<h4 class="mb-3">
+    <i class="fas fa-wrench me-2"></i>
+    {% if service %}Редактирование услуги{% else %}Новая услуга{% endif %}
+</h4>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label class="form-label">Название услуги *</label>
+                <input type="text" name="name" class="form-control" value="{{ service.name|default:'' }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Описание</label>
+                <textarea name="description" class="form-control" rows="3">{{ service.description|default:'' }}</textarea>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Цена (₽) *</label>
+                    <input type="number" name="price" class="form-control" step="0.01" value="{{ service.price|default:'' }}" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Длительность (минуты)</label>
+                    <input type="number" name="duration_minutes" class="form-control" value="{{ service.duration_minutes|default:'60' }}">
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Пункты чек-листа</label>
+                <textarea name="checklist_items" class="form-control" rows="5" placeholder="Слить масло&#10;Заменить масляный фильтр&#10;Залить новое масло&#10;Проверить уровень масла&#10;Сбросить счетчик ТО">{{ service.checklist_items|default:'' }}</textarea>
+                <div class="form-text text-muted">
+                    <i class="fas fa-info-circle"></i> Каждый пункт с новой строки. Эти задачи будет видеть механик при выполнении заказа.
+                </div>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if service.is_active or not service %}checked{% endif %}>
+                <label class="form-check-label" for="is_active">Услуга активна (доступна для записи)</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-save"></i> Сохранить
+            </button>
+            <a href="{% url 'service_list' %}" class="btn btn-outline w-100 mt-2">Отмена</a>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <h6><i class="fas fa-lightbulb"></i> Примеры чек-листов для разных услуг</h6>
+        <div class="row mt-2">
+            <div class="col-md-4">
+                <strong>Замена масла:</strong>
+                <ul class="small">
+                    <li>Слить масло</li>
+                    <li>Заменить масляный фильтр</li>
+                    <li>Залить новое масло</li>
+                    <li>Проверить уровень масла</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <strong>Замена колодок:</strong>
+                <ul class="small">
+                    <li>Снять колесо</li>
+                    <li>Заменить колодки</li>
+                    <li>Установить колесо</li>
+                    <li>Проверить тормозную жидкость</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <strong>Диагностика:</strong>
+                <ul class="small">
+                    <li>Подключить сканер</li>
+                    <li>Считать ошибки</li>
+                    <li>Проверить системы</li>
+                    <li>Составить отчёт</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% block title %}Ожидают подтверждения - ПроСТО{% endblock %}
+{% block content %}
+<h4 class="mb-3"><i class="fas fa-clock me-2"></i>Записи на подтверждение</h4>
+
+{% for appointment in appointments %}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between">
+            <strong>{{ appointment.user.username }}</strong>
+            <span class="badge-status status-pending">Ожидает</span>
+        </div>
+        <p class="small text-muted">{{ appointment.date }} {{ appointment.time }}</p>
+        <p>{{ appointment.vehicle.brand }} {{ appointment.vehicle.model }}</p>
+        <p><small>Услуги: {{ appointment.services.all|join:", " }}</small></p>
+        <a href="{% url 'confirm_appointment' appointment.id %}" class="btn btn-primary w-100">
+            ✅ Подтвердить
+        </a>
+    </div>
+</div>
+{% empty %}
+<div class="card">
+    <div class="card-body text-center">
+        <i class="fas fa-check-circle fa-3x text-muted"></i>
+        <p class="mt-2">Нет записей, ожидающих подтверждения</p>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+{% block title %}Дашборд - ПроСТО{% endblock %}
+{% block content %}
+
+{% if my_orders %}
+<h4 class="mb-3"><i class="fas fa-tasks me-2"></i>Мои заказы</h4>
+{% for order in my_orders %}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between">
+            <strong>{{ order.appointment.vehicle.brand }} {{ order.appointment.vehicle.model }}</strong>
+            <span class="badge-status {% if order.status == 'new' %}status-pending{% else %}status-in_progress{% endif %}">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+        <p class="small text-muted">{{ order.appointment.date }} {{ order.appointment.time }}</p>
+        <p>Клиент: {{ order.appointment.user.username }}</p>
+        <p>Услуги: {{ order.appointment.services.all|join:", " }}</p>
+
+        {% if order.status == 'new' %}
+        <a href="{% url 'start_order' order.id %}" class="btn btn-primary w-100">▶ Начать работы</a>
+        {% else %}
+        <a href="{% url 'order_detail' order.id %}" class="btn btn-primary w-100">⏵ Продолжить</a>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if available_orders %}
+<h4 class="mb-3 mt-4"><i class="fas fa-hand-paper me-2"></i>Доступные заказы</h4>
+{% for order in available_orders %}
+<div class="card mb-3">
+    <div class="card-body">
+        <strong>{{ order.appointment.vehicle.brand }} {{ order.appointment.vehicle.model }}</strong>
+        <p class="small text-muted">{{ order.appointment.date }} {{ order.appointment.time }}</p>
+        <p>Клиент: {{ order.appointment.user.username }}</p>
+        <p>Услуги: {{ order.appointment.services.all|join:", " }}</p>
+        <a href="{% url 'take_order' order.id %}" class="btn btn-success w-100">👆 Взять заказ</a>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if not my_orders and not available_orders %}
+<div class="card">
+    <div class="card-body text-center">
+        <i class="fas fa-check-circle fa-3x text-muted"></i>
+        <p class="mt-2">Нет активных заказов</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
