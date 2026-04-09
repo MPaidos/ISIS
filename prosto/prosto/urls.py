@@ -52,6 +52,4 @@ urlpatterns = [
     path('services/delete/<int:service_id>/', services_views.service_delete, name='service_delete'),
     path('services/toggle/<int:service_id>/', services_views.service_toggle_active, name='service_toggle_active'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
