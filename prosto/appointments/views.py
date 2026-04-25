@@ -6,6 +6,7 @@ from .models import Appointment
 from .forms import AppointmentForm
 from orders.models import Order
 from accounts.models import User
+from services.bitrix24 import Bitrix24API
 
 
 @login_required
@@ -22,6 +23,32 @@ def booking(request):
             appointment.status = 'pending'
             appointment.save()
             form.save_m2m()  # сохраняем ManyToMany (services)
+
+            try:
+                bitrix = Bitrix24API()
+
+                # Проверяем, есть ли уже контакт
+                result = bitrix.find_contact_by_phone(request.user.phone)
+                contact_id = None
+
+                if result.get('result'):
+                    contact_id = result['result'][0]['ID']
+                else:
+                    # Создаём новый контакт
+                    contact_result = bitrix.create_contact(request.user)
+                    if contact_result.get('result'):
+                        contact_id = contact_result['result']
+
+                # Создаём сделку
+                if contact_id:
+                    deal_result = bitrix.create_deal(appointment, contact_id)
+                    if deal_result.get('result'):
+                        print(f"Создана сделка в Битрикс24: {deal_result['result']}")
+                    else:
+                        print(f"Ошибка создания сделки: {deal_result}")
+            except Exception as e:
+                print(f"Bitrix24 integration error: {e}")
+
             messages.success(request, f'Запись создана! Ожидайте подтверждения. ID: {appointment.id}')
             return redirect('appointment_confirmation', appointment_id=appointment.id)
     else:

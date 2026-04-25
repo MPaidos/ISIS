@@ -17,7 +17,8 @@ import sys
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+BITRIX24_WEBHOOK = 'https://b24-t40eh4.bitrix24.ru/rest/1/c8l8pdjyuyn0gsmj/'
+BITRIX24_INTEGRATION_ENABLED = True  # Отключить при отсутствии интернета
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
